@@ -1,3 +1,12 @@
+require('dotenv').config();
+console.log("📦 Cargando variables desde .env:");
+console.log("HOST:", process.env.HOST);
+console.log("USER:", process.env.USER);
+console.log("PASSWORD:", process.env.PASSWORD);
+console.log("DATABASE:", process.env.DATABASE);
+console.log("DBPORT:", process.env.DBPORT);
+
+
 const express = require('express');
 const mysql = require('mysql2');
 const bodyParser = require('body-parser');
@@ -9,21 +18,23 @@ app.use(bodyParser.json());
 // Servir archivos estáticos desde la carpeta 'public'
 app.use(express.static('public'));
 
-// Conexión a la base de datos MySQL
+
+// 🔌 Conexión a MySQL en Railway
 const connection = mysql.createConnection({
-    host: 'localhost',
-    user: 'root', // Usuario de MySQL
-    password: 'ROOT', // Contraseña de MySQL
-    database: 'sistema_diagnostico' // Nombre de la base de datos
+    host: process.env.HOST || 'mysql.railway.internal',
+    user: process.env.USER || 'root',
+    password: process.env.PASSWORD,
+    database: process.env.DATABASE || 'railway',
+    port: process.env.DBPORT || 3306,
+    ssl: { rejectUnauthorized: false }
 });
 
-// Conectar a MySQL
-connection.connect((err) => {
+connection.connect(err => {
     if (err) {
-        console.error('Error de conexión: ' + err.stack);
+        console.error('❌ Error de conexión a Railway:', err.stack);
         return;
     }
-    console.log('Conectado a la base de datos con id ' + connection.threadId);
+    console.log('✅ Conectado a Railway con id ' + connection.threadId);
 });
 
 
