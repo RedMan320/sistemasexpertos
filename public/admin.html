@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Administración</title>
+    <style>
+        body {
+            background-color: #3d0a45;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #e65c00;
+        }
+
+        .container {
+            margin: 20px;
+            padding: 20px;
+            background-color: #5e1131;
+            border-radius: 10px;
+        }
+
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #e65c00;
+            color: white;
+        }
+
+        button:hover {
+            background-color: #c75300;
+        }
+
+        .form-group {
+            text-align: left;
+            margin-bottom: 10px;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+        }
+
+        .form-group label {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Panel de Administración</h1>
+
+    <!-- Login -->
+    <div id="loginForm">
+        <h2>Iniciar sesión</h2>
+        <form id="login">
+            <div class="form-group">
+                <label for="email">Correo electrónico:</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">Contraseña:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <button type="submit">Iniciar sesión</button>
+        </form>
+    </div>
+
+    <!-- Formulario de administración de síntomas, enfermedades y tratamientos -->
+    <div id="adminPanel" style="display:none;">
+        <h2>Agregar nueva enfermedad, síntoma o tratamiento</h2>
+
+        <h3>Agregar Síntoma</h3>
+        <form id="addSymptomForm">
+            <div class="form-group">
+                <label for="symptomName">Nombre del síntoma:</label>
+                <input type="text" id="symptomName" name="symptomName" required>
+            </div>
+            <button type="submit">Agregar Síntoma</button>
+        </form>
+
+        <h3>Agregar Enfermedad</h3>
+        <form id="addDiseaseForm">
+            <div class="form-group">
+                <label for="diseaseName">Nombre de la enfermedad:</label>
+                <input type="text" id="diseaseName" name="diseaseName" required>
+            </div>
+            <div class="form-group">
+                <label for="treatment">Tratamiento Médico:</label>
+                <input type="text" id="treatment" name="treatment" required>
+            </div>
+            <div class="form-group">
+                <label for="alternativeTreatment">Tratamiento Alternativo:</label>
+                <input type="text" id="alternativeTreatment" name="alternativeTreatment" required>
+            </div>
+            <button type="submit">Agregar Enfermedad</button>
+        </form>
+
+        <h3>Relación de síntomas con enfermedades</h3>
+        <form id="linkSymptomToDiseaseForm">
+            <div class="form-group">
+                <label for="symptom">Síntoma:</label>
+                <select id="symptom" name="symptom" required>
+                    <!-- Aquí se llenarán los síntomas -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="disease">Enfermedad:</label>
+                <select id="disease" name="disease" required>
+                    <!-- Aquí se llenarán las enfermedades -->
+                </select>
+            </div>
+            <button type="submit">Relacionar Síntoma con Enfermedad</button>
+        </form>
+
+        <!-- Botón de Logout -->
+        <button id="logoutButton" onclick="logout()">Cerrar sesión</button>
+    </div>
+
+    <script>
+        // Lógica de inicio de sesión
+        document.getElementById('login').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            fetch('http://localhost:3000/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.message === 'Autenticación exitosa') {
+                    document.getElementById('loginForm').style.display = 'none';
+                    document.getElementById('adminPanel').style.display = 'block';
+                    alert('Bienvenido, Administrador!');
+                    obtenerSintomasYEnfermedades();
+                } else {
+                    alert('Credenciales incorrectas');
+                }
+            });
+        });
+
+        // Función de logout
+        function logout() {
+            document.getElementById('adminPanel').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+            alert('Has cerrado sesión');
+        }
+
+        // Función para obtener los síntomas y enfermedades
+        function obtenerSintomasYEnfermedades() {
+            fetch('http://localhost:3000/admin/getSymptoms')
+                .then(response => response.json())
+                .then(data => {
+                    const sintomasSelect = document.getElementById('symptom');
+                    data.sintomas.forEach(sintoma => {
+                        const option = document.createElement('option');
+                        option.value = sintoma.id;
+                        option.textContent = sintoma.nombre;
+                        sintomasSelect.appendChild(option);
+                    });
+                });
+
+            fetch('http://localhost:3000/admin/getDiseases')
+                .then(response => response.json())
+                .then(data => {
+                    const enfermedadesSelect = document.getElementById('disease');
+                    data.enfermedades.forEach(enfermedad => {
+                        const option = document.createElement('option');
+                        option.value = enfermedad.id;
+                        option.textContent = enfermedad.nombre;
+                        enfermedadesSelect.appendChild(option);
+                    });
+                });
+        }
+
+        // Agregar un síntoma
+        document.getElementById('addSymptomForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('symptomName').value;
+            fetch('http://localhost:3000/admin/addSymptom', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                obtenerSintomasYEnfermedades();
+            });
+        });
+
+        // Agregar una enfermedad
+        document.getElementById('addDiseaseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nombre = document.getElementById('diseaseName').value;
+            const tratamiento = document.getElementById('treatment').value;
+            const alternativeTreatment = document.getElementById('alternativeTreatment').value;
+
+            fetch('http://localhost:3000/admin/addDisease', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre, tratamiento_medico: tratamiento, tratamiento_alternativo: alternativeTreatment })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                obtenerSintomasYEnfermedades();
+            });
+        });
+
+        // Relacionar un síntoma con una enfermedad
+        document.getElementById('linkSymptomToDiseaseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const sintoma_id = document.getElementById('symptom').value;
+            const enfermedad_id = document.getElementById('disease').value;
+
+            fetch('http://localhost:3000/admin/linkSymptomToDisease', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sintoma_id, enfermedad_id })
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+            });
+        });
+    </script>
+
+</body>
+</html>

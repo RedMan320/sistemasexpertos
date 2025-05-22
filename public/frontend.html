@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sistema Experto de Diagnóstico Médico</title>
+  <style>
+    body {
+      background-color: #3d0a45;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #e65c00;
+    }
+
+    .container {
+      margin: 20px;
+      padding: 20px;
+      background-color: #5e1131;
+      border-radius: 10px;
+    }
+
+    .checkbox-list {
+      text-align: left;
+      margin: 20px auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 10px;
+      max-width: 100%;
+    }
+
+    .checkbox-list input {
+      width: 20px;
+      height: 20px;
+      margin-right: 10px;
+    }
+
+    .checkbox-list label {
+      display: inline-block;
+      margin-bottom: 5px;
+    }
+
+    #diagnostico {
+      margin-top: 20px;
+      padding: 20px;
+      background-color: #f2f2f2;
+      color: black;
+      border-radius: 10px;
+      display: none;
+    }
+
+    #diagnostico h2 {
+      color: #3d0a45;
+    }
+
+    button {
+      background-color: #e65c00;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #c75300;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Sistema Experto de Diagnóstico Médico</h1>
+  <div class="container">
+    <p>Seleccione los síntomas que presenta:</p>
+    <div class="checkbox-list">
+      <div><input type="checkbox" id="congestion nasal"> <label for="congestion nasal">congestión nasal</label></div>
+      <div><input type="checkbox" id="diarrea"> <label for="diarrea">diarrea</label></div>
+      <div><input type="checkbox" id="dolor abdominal"> <label for="dolor abdominal">dolor abdominal</label></div>
+      <div><input type="checkbox" id="dolor articular"> <label for="dolor articular">dolor articular</label></div>
+      <div><input type="checkbox" id="dolor de cabeza"> <label for="dolor de cabeza">dolor de cabeza</label></div>
+      <div><input type="checkbox" id="dolor de garganta"> <label for="dolor de garganta">dolor de garganta</label></div>
+      <div><input type="checkbox" id="dolor muscular"> <label for="dolor muscular">dolor muscular</label></div>
+      <div><input type="checkbox" id="dolor en el pecho"> <label for="dolor en el pecho">dolor en el pecho</label></div>
+      <div><input type="checkbox" id="dolor al orinar"> <label for="dolor al orinar">dolor al orinar</label></div>
+      <div><input type="checkbox" id="dificultad para respirar"> <label for="dificultad para respirar">dificultad para respirar</label></div>
+      <div><input type="checkbox" id="dificultad para tragar"> <label for="dificultad para tragar">dificultad para tragar</label></div>
+      <div><input type="checkbox" id="escalofríos"> <label for="escalofríos">escalofríos</label></div>
+      <div><input type="checkbox" id="erupciones cutáneas"> <label for="erupciones cutáneas">erupciones cutáneas</label></div>
+      <div><input type="checkbox" id="fiebre"> <label for="fiebre">fiebre</label></div>
+      <div><input type="checkbox" id="fatiga"> <label for="fatiga">fatiga</label></div>
+      <div><input type="checkbox" id="falta de apetito"> <label for="falta de apetito">falta de apetito</label></div>
+      <div><input type="checkbox" id="frecuencia urinaria"> <label for="frecuencia urinaria">frecuencia urinaria</label></div>
+      <div><input type="checkbox" id="ictericia"> <label for="ictericia">ictericia</label></div>
+      <div><input type="checkbox" id="indigestión"> <label for="indigestión">indigestión</label></div>
+      <div><input type="checkbox" id="mareo"> <label for="mareo">mareo</label></div>
+      <div><input type="checkbox" id="náuseas"> <label for="náuseas">náuseas</label></div>
+      <div><input type="checkbox" id="ojos llorosos"> <label for="ojos llorosos">ojos llorosos</label></div>
+      <div><input type="checkbox" id="picazón"> <label for="picazón">picazón</label></div>
+      <div><input type="checkbox" id="presión facial"> <label for="presión facial">presión facial</label></div>
+      <div><input type="checkbox" id="pérdida del gusto"> <label for="pérdida del gusto">pérdida del gusto</label></div>
+      <div><input type="checkbox" id="pérdida del olfato"> <label for="pérdida del olfato">pérdida del olfato</label></div>
+      <div><input type="checkbox" id="ronquera"> <label for="ronquera">ronquera</label></div>
+      <div><input type="checkbox" id="silbido en el pecho"> <label for="silbido en el pecho">silbido en el pecho</label></div>
+      <div><input type="checkbox" id="sudoración excesiva"> <label for="sudoración excesiva">sudoración excesiva</label></div>
+      <div><input type="checkbox" id="sudoración nocturna"> <label for="sudoración nocturna">sudoración nocturna</label></div>
+      <div><input type="checkbox" id="tos"> <label for="tos">tos</label></div>
+      <div><input type="checkbox" id="sequedad de la piel"> <label for="sequedad de la piel">sequedad de la piel</label></div>
+    </div>
+  </div>
+
+  <button onclick="obtenerDiagnostico()">Diagnosticar</button>
+  <button onclick="reiniciarConsulta()">Reiniciar consulta</button>
+
+  <div id="diagnostico">
+    <h2>Diagnóstico y Tratamiento</h2>
+    <div id="resultadoTratamiento"></div>
+  </div>
+
+  <button onclick="window.location.href='login.html'">ERES ADMINISTRADOR</button>
+
+  <script>
+    function obtenerDiagnostico() {
+      const sintomas = [];
+      const checkboxes = document.querySelectorAll('.checkbox-list input');
+      checkboxes.forEach(checkbox => {
+        if (checkbox.checked) {
+          sintomas.push(checkbox.id);
+        }
+      });
+
+      if (sintomas.length === 0) {
+        alert("Por favor, seleccione al menos un síntoma.");
+        return;
+      }
+
+      fetch('http://localhost:3000/diagnosticar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sintomas })
+      })
+      .then(response => response.json())
+      .then(data => {
+        const diagnosticoDiv = document.getElementById('diagnostico');
+        const resultadoTratamiento = document.getElementById('resultadoTratamiento');
+
+        if (data.diagnostico && data.diagnostico.length > 0) {
+          let contenido = "<ul>";
+
+          // Mostrar solo las 3 enfermedades más probables
+          const topDiagnosticos = data.diagnostico
+            .sort((a, b) => parseFloat(b.probabilidad) - parseFloat(a.probabilidad))
+            .slice(0, 3);
+
+          topDiagnosticos.forEach(item => {
+            contenido += `
+              <li>
+                <strong>${item.enfermedad}</strong><br>
+                Coincidencia: <strong>${item.probabilidad}</strong><br>
+                Tratamiento Médico: ${item.tratamiento_medico}<br>
+                Tratamiento Alternativo: ${item.tratamiento_alternativo}
+              </li><br>`;
+          });
+
+          contenido += "</ul>";
+          resultadoTratamiento.innerHTML = contenido;
+        } else {
+          resultadoTratamiento.innerHTML = "No se encontró un diagnóstico basado en los síntomas seleccionados.";
+        }
+
+        diagnosticoDiv.style.display = 'block';
+      })
+      .catch(error => {
+        console.error('Error al obtener el diagnóstico:', error);
+        alert("Ocurrió un error al obtener el diagnóstico.");
+      });
+    }
+
+    function reiniciarConsulta() {
+      const checkboxes = document.querySelectorAll('.checkbox-list input');
+      checkboxes.forEach(checkbox => {
+        checkbox.checked = false;
+      });
+      document.getElementById('diagnostico').style.display = 'none';
+      document.getElementById('resultadoTratamiento').innerHTML = "";
+    }
+  </script>
+</body>
+</html>
+

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema Experto de Diagnóstico Médico</title>
+    <style>
+        body {
+            background-color: #3d0a45;
+            color: white;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #e65c00;
+        }
+
+        .container {
+            margin: 20px;
+            padding: 20px;
+            background-color: #5e1131;
+            border-radius: 10px;
+        }
+
+        #loginForm {
+            margin: 20px auto;
+            max-width: 300px;
+            padding: 20px;
+            background-color: #5e1131;
+            border-radius: 10px;
+        }
+
+        input[type="email"], input[type="password"] {
+            padding: 10px;
+            margin: 10px;
+            width: 100%;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background-color: #e65c00;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #c75300;
+        }
+
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Sistema Experto de Diagnóstico Médico - Login</h1>
+    <div class="container">
+        <div id="loginForm">
+            <h2>Iniciar sesión </h2>
+            <input type="email" id="email" placeholder="Correo electrónico" /><br>
+            <input type="password" id="password" placeholder="Contraseña" /><br>
+            <button onclick="login()">Entrar</button>
+            <div id="errorMessage" class="error"></div>
+        </div>
+    </div>
+
+    <script>
+        function login() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Verificación básica de los campos vacíos
+            if (email === '' || password === '') {
+                document.getElementById('errorMessage').textContent = 'Por favor, ingrese correo y contraseña.';
+                return;
+            }
+
+            // Realizar la consulta al backend para autenticar
+            fetch('http://localhost:3000/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            })
+            .then(response => response.json())
+
+
+
+            
+            .then(data => {
+                if (data.redirectTo) {
+                    // Redirigir al panel de administrador si la autenticación es exitosa
+                    window.location.href = data.redirectTo;
+                } else {
+                    document.getElementById('errorMessage').textContent = data.message || 'Credenciales incorrectas.';
+                }
+            })
+            .catch(error => {
+                console.error('Error al intentar iniciar sesión:', error);
+                document.getElementById('errorMessage').textContent = 'Ocurrió un error al intentar iniciar sesión.';
+            });
+        }
+    </script>
+
+</body>
+</html>
+
